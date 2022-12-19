@@ -35,6 +35,8 @@ func main() {
 	r.GET("/users", controller.AllUsers)
 	r.POST("/user", controller.CreateUser)
 	r.GET("/user/active/:id", controller.ActiveUser)
+	r.GET("/user/:id", controller.ViewUser)
+	r.PUT("/reset-password", controller.ResetPassword)
 
 	r.Run(":8082")
 }

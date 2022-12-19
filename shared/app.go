@@ -19,6 +19,7 @@ type configApp struct {
 		ActivateUser  string `yaml:"activateUser"`
 		FindUser      string `yaml:"findUser"`
 		Unsuscribe    string `yaml:"unsuscribe"`
+		ResetPassword string `yaml:"resetPassword"`
 	}
 }
 

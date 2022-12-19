@@ -6,7 +6,8 @@ import (
 	"abix360/src/view/dto"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
+
 	"net/http"
 	"strconv"
 	"strings"
@@ -37,7 +38,7 @@ func (useCase *FindUserUseCase) Execute(c *gin.Context, id int64) domain.User {
 	}
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		fmt.Println(err)
 		return domain.User{}
@@ -58,6 +59,7 @@ func (useCase *FindUserUseCase) Execute(c *gin.Context, id int64) domain.User {
 	user.WithName(userDto.Name)
 	user.WithEmail(userDto.Email)
 	user.WithState(userDto.State)
+	user.WithCreatedAt(userDto.CreatedAt)
 
 	return *user
 }

@@ -6,6 +6,7 @@ type User struct {
 	email      string
 	password   string
 	state      bool
+	createdAt  string
 	repository UserRepository
 }
 
@@ -38,11 +39,40 @@ func (u *User) WithState(state bool) *User {
 	return u
 }
 
+func (u *User) WithCreatedAt(createdAt string) *User {
+	u.createdAt = createdAt
+	return u
+}
+
 func (u *User) WithRepository(repository UserRepository) *User {
 	u.repository = repository
 	return u
 }
 
-func Users(repository UserRepository) []User {
+func (u *User) Id() int64 {
+	return u.id
+}
+
+func (u *User) Name() string {
+	return u.name
+}
+
+func (u *User) Email() string {
+	return u.email
+}
+
+func (u *User) Password() string {
+	return u.password
+}
+
+func (u *User) State() bool {
+	return u.state
+}
+
+func (u *User) CreatedAt() string {
+	return u.createdAt
+}
+
+func ListUsers(repository UserRepository) []User {
 	return repository.AllUsers()
 }

@@ -1,7 +1,6 @@
-package abixauth
+package shared
 
 import (
-	"abix360/shared"
 	"fmt"
 	"io"
 	"net/http"
@@ -11,8 +10,8 @@ import (
 )
 
 func ValidateToken(c *gin.Context) bool {
-	token := getTokenRequest(c)
-	url := shared.Config().Appauth.EndPointValidateToken
+	token := GetTokenRequest(c)
+	url := Config().Appauth.EndPointValidateToken
 	client := &http.Client{}
 
 	req, err := http.NewRequest("GET", url, nil)
@@ -40,7 +39,7 @@ func ValidateToken(c *gin.Context) bool {
 	return string(body) == "{\"isValid\":true}"
 }
 
-func getTokenRequest(c *gin.Context) string {
+func GetTokenRequest(c *gin.Context) string {
 	const BEARER_SCHEMA = "Bearer "
 	authHeader := c.GetHeader("Authorization")
 	if len(authHeader) == 0 {

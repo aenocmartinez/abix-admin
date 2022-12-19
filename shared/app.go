@@ -13,6 +13,8 @@ type configApp struct {
 	}
 	Appauth struct {
 		EndPointValidateToken string `yaml:"endPointValidateToken"`
+		EndPointAllUsers      string `yaml:"endPointAllUsers"`
+		EndPointCreateUser    string `yaml:"endPointCreateUser"`
 	}
 }
 

@@ -2,28 +2,27 @@ package usecase
 
 import (
 	"abix360/shared"
+	"abix360/src/view/dto"
 	"fmt"
 	"io"
 	"net/http"
-
-	"github.com/gin-gonic/gin"
+	"strings"
 )
 
-type ListUsersUseCase struct{}
+type CreateUserUseCase struct{}
 
-func (useCase *ListUsersUseCase) Execute(c *gin.Context) interface{} {
-	token := shared.GetTokenRequest(c)
-	url := shared.Config().Appauth.EndPointAllUsers
+func (useCase *CreateUserUseCase) Execute(createUser dto.CreateUserDto) interface{} {
+	url := shared.Config().Appauth.EndPointCreateUser
+	payload := strings.NewReader("{\"name\":\"" + createUser.Name + "\", \"email\":\"" + createUser.Email + "\", \"password\":\"" + createUser.Password + "\"}")
 
 	client := &http.Client{}
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest("POST", url, payload)
 
 	if err != nil {
 		fmt.Println(err)
 		return ""
 	}
 	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Authorization", "Bearer "+token)
 
 	res, err := client.Do(req)
 	if err != nil {

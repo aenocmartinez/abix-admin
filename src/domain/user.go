@@ -1,13 +1,12 @@
 package domain
 
 type User struct {
-	id         int64
-	name       string
-	email      string
-	password   string
-	state      bool
-	createdAt  string
-	repository UserRepository
+	id        int64
+	name      string
+	email     string
+	password  string
+	state     bool
+	createdAt string
 }
 
 func NewUser() *User {
@@ -44,11 +43,6 @@ func (u *User) WithCreatedAt(createdAt string) *User {
 	return u
 }
 
-func (u *User) WithRepository(repository UserRepository) *User {
-	u.repository = repository
-	return u
-}
-
 func (u *User) Id() int64 {
 	return u.id
 }
@@ -75,8 +69,4 @@ func (u *User) CreatedAt() string {
 
 func (u *User) Exists() bool {
 	return u.id > 0
-}
-
-func ListUsers(repository UserRepository) []User {
-	return repository.AllUsers()
 }

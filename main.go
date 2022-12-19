@@ -38,5 +38,12 @@ func main() {
 	r.GET("/user/:id", controller.ViewUser)
 	r.PUT("/reset-password", controller.ResetPassword)
 
+	// Collections
+	r.GET("/collections", controller.AllCollections)
+	r.POST("/collection", controller.CreateCollection)
+	r.GET("/collection/:id", controller.ViewCollection)
+	r.PUT("/collection", controller.UpdateCollection)
+	r.DELETE("/collection/:id", controller.DeleteCollection)
+
 	r.Run(":8082")
 }

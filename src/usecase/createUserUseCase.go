@@ -12,7 +12,8 @@ import (
 type CreateUserUseCase struct{}
 
 func (useCase *CreateUserUseCase) Execute(createUser dto.CreateUserDto) interface{} {
-	url := shared.Config().Appauth.EndPointCreateUser
+
+	url := shared.Config().Appauth.Server + "/" + shared.Config().Appauth.CreateUser
 	payload := strings.NewReader("{\"name\":\"" + createUser.Name + "\", \"email\":\"" + createUser.Email + "\", \"password\":\"" + createUser.Password + "\"}")
 
 	client := &http.Client{}

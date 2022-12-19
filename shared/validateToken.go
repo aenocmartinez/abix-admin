@@ -11,7 +11,7 @@ import (
 
 func ValidateToken(c *gin.Context) bool {
 	token := GetTokenRequest(c)
-	url := Config().Appauth.EndPointValidateToken
+	url := Config().Appauth.Server + "/" + Config().Appauth.ValidateToken
 	client := &http.Client{}
 
 	req, err := http.NewRequest("GET", url, nil)

@@ -12,9 +12,10 @@ type configApp struct {
 		Secret string `yaml:"secret"`
 	}
 	Appauth struct {
-		EndPointValidateToken string `yaml:"endPointValidateToken"`
-		EndPointAllUsers      string `yaml:"endPointAllUsers"`
-		EndPointCreateUser    string `yaml:"endPointCreateUser"`
+		Server        string `yaml:"server"`
+		ValidateToken string `yaml:"validateToken"`
+		AllUsers      string `yaml:"allUsers"`
+		CreateUser    string `yaml:"createUser"`
 	}
 }
 

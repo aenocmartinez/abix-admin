@@ -34,6 +34,7 @@ func main() {
 
 	r.GET("/users", controller.AllUsers)
 	r.POST("/user", controller.CreateUser)
+	r.GET("/user/active/:id", controller.ActiveUser)
 
 	r.Run(":8082")
 }

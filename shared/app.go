@@ -16,6 +16,9 @@ type configApp struct {
 		ValidateToken string `yaml:"validateToken"`
 		AllUsers      string `yaml:"allUsers"`
 		CreateUser    string `yaml:"createUser"`
+		ActivateUser  string `yaml:"activateUser"`
+		FindUser      string `yaml:"findUser"`
+		Unsuscribe    string `yaml:"unsuscribe"`
 	}
 }
 

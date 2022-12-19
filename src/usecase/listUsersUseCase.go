@@ -13,7 +13,6 @@ type ListUsersUseCase struct{}
 
 func (useCase *ListUsersUseCase) Execute(c *gin.Context) interface{} {
 	token := shared.GetTokenRequest(c)
-	// url := shared.Config().Appauth.EndPointAllUsers
 	url := shared.Config().Appauth.Server + "/" + shared.Config().Appauth.AllUsers
 
 	client := &http.Client{}

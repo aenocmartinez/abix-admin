@@ -73,6 +73,10 @@ func (u *User) CreatedAt() string {
 	return u.createdAt
 }
 
+func (u *User) Exists() bool {
+	return u.id > 0
+}
+
 func ListUsers(repository UserRepository) []User {
 	return repository.AllUsers()
 }

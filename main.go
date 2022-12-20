@@ -51,6 +51,7 @@ func main() {
 	r.GET("/field/:id", controller.ViewField)
 	r.DELETE("/field/:id", controller.DeleteField)
 	r.PUT("/field", controller.UpdateField)
+	r.GET("/search-fields", controller.SearchFields)
 
 	r.Run(":8082")
 }

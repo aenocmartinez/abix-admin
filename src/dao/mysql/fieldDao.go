@@ -222,14 +222,14 @@ func (f *FieldDao) SearchByName(name string) []domain.IField {
 	strSQL.WriteString("f.id, f.name, f.description, f.abbreviation, f.createdAt, f.updatedAt, IF(count(s.id) > 0, 1, 0) as hasSubfields ")
 	strSQL.WriteString("FROM fields f ")
 	strSQL.WriteString("LEFT JOIN subfields s ON f.id = s.field_id ")
-	strSQL.WriteString("WHERE f.name like %?% GROUP BY f.id")
+	strSQL.WriteString("WHERE f.name like ? GROUP BY f.id")
 
 	stmt, err := f.db.Source().Conn().Prepare(strSQL.String())
 	if err != nil {
 		log.Println("abix-admin / FieldDao / SearchByName / conn.Prepare: ", err.Error())
 	}
 
-	rows, err := stmt.Query(name)
+	rows, err := stmt.Query("%" + name + "%")
 	if err != nil {
 		log.Println("abix-admin / FieldDao / SearchByName / stmt.Query(): ", err.Error())
 	}

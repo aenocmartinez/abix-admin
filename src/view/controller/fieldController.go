@@ -130,3 +130,10 @@ func AllFields(c *gin.Context) {
 	fields := useCase.Execute()
 	c.JSON(200, gin.H{"result": fields})
 }
+
+func SearchFields(c *gin.Context) {
+	name := c.Query("name")
+	useCase := usecase.SearchFieldUseCase{}
+	fields := useCase.Execute(name)
+	c.JSON(200, gin.H{"result": fields})
+}

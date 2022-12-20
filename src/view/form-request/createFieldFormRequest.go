@@ -4,7 +4,7 @@ type CreateFieldFormRequest struct {
 	Name         string     `json:"name" binding:"required"`
 	Description  string     `json:"description" binding:"required"`
 	Abbreviation string     `json:"abbreviation" binding:"required"`
-	Subfield     []Subfield `json:"subfield,omitempty"`
+	Subfield     []Subfield `json:"subfields,omitempty"`
 }
 
 type Subfield struct {

@@ -89,15 +89,18 @@ func (f *FieldDao) Update(field domain.IField) error {
 		return err
 	}
 
+	err = f.deleteSubfields(field.Id())
+	if err != nil {
+		log.Println("abix-admin / FieldDao / Update / f.deleteSubfields(): ", err.Error())
+	}
+
 	if field.IsComposite() {
 		compositeField, ok := field.(*domain.CompositeField)
 		if !ok {
 			return errors.New("conversion a campo compuesto")
 		}
-		f.deleteSubfields(field.Id())
 		for _, subfieldvo := range compositeField.Subfield() {
 			f.addSubfield(field.Id(), subfieldvo.Field.Id(), subfieldvo.Order)
-			// f.updateOrderSubfield(field.Id(), subfieldvo.Field.Id(), subfieldvo.Order)
 		}
 	}
 
@@ -174,7 +177,7 @@ func (f *FieldDao) AllFields() []domain.IField {
 	return fields
 }
 
-func (f *FieldDao) FindByName(name string, search bool) domain.IField {
+func (f *FieldDao) FindByName(name string) domain.IField {
 	var field domain.IField
 	var strSQL bytes.Buffer
 
@@ -184,11 +187,7 @@ func (f *FieldDao) FindByName(name string, search bool) domain.IField {
 	strSQL.WriteString("f.id, f.name, f.description, f.abbreviation, f.createdAt, f.updatedAt, IF(count(s.id) > 0, 1, 0) as hasSubfields ")
 	strSQL.WriteString("FROM fields f ")
 	strSQL.WriteString("LEFT JOIN subfields s ON f.id = s.field_id ")
-	if !search {
-		strSQL.WriteString("WHERE f.name = ? GROUP BY f.id")
-	} else {
-		strSQL.WriteString("WHERE f.name like %?% GROUP BY f.id")
-	}
+	strSQL.WriteString("WHERE f.name = ? GROUP BY f.id")
 
 	stmt, err := f.db.Source().Conn().Prepare(strSQL.String())
 	if err != nil {
@@ -210,6 +209,46 @@ func (f *FieldDao) FindByName(name string, search bool) domain.IField {
 	field.WithId(id).WithAbbreviation(abbreviation).WithDescription(description).WithCreatedAt(createdAt).WithUpdatedAt(updatedAt)
 
 	return field
+}
+
+func (f *FieldDao) SearchByName(name string) []domain.IField {
+	var fields []domain.IField
+	var field domain.IField
+	var strSQL bytes.Buffer
+
+	name = strings.TrimSpace(name)
+
+	strSQL.WriteString("SELECT ")
+	strSQL.WriteString("f.id, f.name, f.description, f.abbreviation, f.createdAt, f.updatedAt, IF(count(s.id) > 0, 1, 0) as hasSubfields ")
+	strSQL.WriteString("FROM fields f ")
+	strSQL.WriteString("LEFT JOIN subfields s ON f.id = s.field_id ")
+	strSQL.WriteString("WHERE f.name like %?% GROUP BY f.id")
+
+	stmt, err := f.db.Source().Conn().Prepare(strSQL.String())
+	if err != nil {
+		log.Println("abix-admin / FieldDao / SearchByName / conn.Prepare: ", err.Error())
+	}
+
+	rows, err := stmt.Query(name)
+	if err != nil {
+		log.Println("abix-admin / FieldDao / SearchByName / stmt.Query(): ", err.Error())
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var name, description, abbreviation, createdAt, updatedAt string
+		var id int64
+		var hasSubfields bool
+		rows.Scan(&id, &name, &description, &abbreviation, &createdAt, &updatedAt, &hasSubfields)
+		field = domain.NewSingleField(name)
+		if hasSubfields {
+			field = domain.NewCompositeField(name, f.getSubfields(id))
+		}
+		field.WithId(id).WithAbbreviation(abbreviation).WithDescription(description).WithCreatedAt(createdAt).WithUpdatedAt(updatedAt)
+		fields = append(fields, field)
+	}
+
+	return fields
 }
 
 func (f *FieldDao) addSubfield(idField, idSubfield int64, order int) error {

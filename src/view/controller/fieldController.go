@@ -4,7 +4,6 @@ import (
 	"abix360/src/usecase"
 	"abix360/src/view/dto"
 	formrequest "abix360/src/view/form-request"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -52,8 +51,6 @@ func UpdateField(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	fmt.Println("req.Subfield: ", req.Subfield)
 
 	var subfields []dto.SubfieldDto
 	if len(req.Subfield) > 0 {

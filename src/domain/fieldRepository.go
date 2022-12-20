@@ -7,4 +7,5 @@ type FieldRepository interface {
 	FindById(id int64) IField
 	AllFields() []IField
 	FindByName(name string) IField
+	SearchByName(name string) []IField
 }

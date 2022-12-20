@@ -5,7 +5,6 @@ import (
 	"abix360/src/domain"
 	"abix360/src/view/dto"
 	"errors"
-	"fmt"
 )
 
 type UpdateFieldUseCase struct {
@@ -20,9 +19,7 @@ func (useCase *UpdateFieldUseCase) Execute(dtoField dto.FieldDto) (code int, err
 		return 202, errors.New("el campo no existe")
 	}
 
-	fmt.Println("UseCase / dtoField.Subfields: ", dtoField.Subfields)
-
-	if len(dtoField.Subfields) > 0 {
+	if field.IsComposite() || len(dtoField.Subfields) > 0 {
 		field = domain.NewCompositeField(dtoField.Name, dtoField.Subfields)
 	}
 

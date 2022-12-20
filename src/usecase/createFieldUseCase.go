@@ -14,7 +14,7 @@ func (useCase *CreateFieldUseCase) Execute(dtoField dto.FieldDto) (code int, err
 	var field domain.IField
 	var repository domain.FieldRepository = mysql.NewFieldDao()
 
-	field = domain.FindFieldByName(dtoField.Name, false, repository)
+	field = domain.FindFieldByName(dtoField.Name, repository)
 	if field.Exists() {
 		return 202, errors.New("el campo ya existe")
 	}

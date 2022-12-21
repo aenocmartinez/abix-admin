@@ -49,6 +49,7 @@ func main() {
 	r.POST("/collection/add-field", controller.AddFieldToCollection)
 	r.DELETE("/collection/remove-field/:idCollection/:idField", controller.RemoveFieldToCollection)
 	r.GET("/collection/fields/:idCollection", controller.AllFieldsOfCollections)
+	r.GET("/collection/field/:id", controller.ViewFieldCollection)
 
 	// Fields
 	r.POST("/field", controller.CreateField)

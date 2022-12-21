@@ -107,14 +107,14 @@ func (f *FieldCollectionDao) AllFields(idCollection int64) (fields []domain.Fiel
 	return fields
 }
 
-func (f *FieldCollectionDao) FindById(idCollection, idField int64) domain.FieldCollection {
+func (f *FieldCollectionDao) FindByIdCollectionAndIdField(idCollection, idField int64) domain.FieldCollection {
 	var fieldCollection domain.FieldCollection
 	var collection domain.Collection
 	var field domain.IField
 
 	var strSQL bytes.Buffer
 	strSQL.WriteString("SELECT ")
-	strSQL.WriteString("c.id, c.name, f.id, f.name, f.description, f.abbreviation, fc.isUnique, fc.required, fc.editable, count(s.id) as hasSubfields ")
+	strSQL.WriteString("c.id, c.name, f.id, f.name, f.description, f.abbreviation, fc.isUnique, fc.required, fc.editable, count(s.id) as hasSubfields, fc.id ")
 	strSQL.WriteString("FROM fields f ")
 	strSQL.WriteString("INNER JOIN fields_collection fc ON f.id = fc.field_id ")
 	strSQL.WriteString("INNER JOIN collections c ON c.id = fc.collection_id ")
@@ -133,8 +133,9 @@ func (f *FieldCollectionDao) FindById(idCollection, idField int64) domain.FieldC
 	idField = 0
 	var nameField, nameCollection, description, abbreviation string
 	var unique, required, editable, hasSubfields bool
+	var id int64
 
-	row.Scan(&idCollection, &nameCollection, &idField, &nameField, &description, &abbreviation, &unique, &required, &editable, &hasSubfields)
+	row.Scan(&idCollection, &nameCollection, &idField, &nameField, &description, &abbreviation, &unique, &required, &editable, &hasSubfields, &id)
 
 	collection = *domain.NewCollection(nameCollection).WithId(idCollection)
 	field = domain.NewSingleField(nameField)
@@ -144,7 +145,7 @@ func (f *FieldCollectionDao) FindById(idCollection, idField int64) domain.FieldC
 
 	field.WithId(idField).WithAbbreviation(abbreviation).WithDescription(description)
 
-	fieldCollection.WithUnique(unique).WithEditable(editable).WithRequired(required).WithCollection(collection).WithField(field)
+	fieldCollection.WithUnique(unique).WithEditable(editable).WithRequired(required).WithCollection(collection).WithField(field).WithId(id)
 
 	return fieldCollection
 }
@@ -201,4 +202,45 @@ func (f *FieldCollectionDao) getSubfields(idField int64) []dto.SubfieldDto {
 	}
 
 	return subfields
+}
+
+func (f *FieldCollectionDao) FindById(id int64) domain.FieldCollection {
+	var nameField, nameCollection, description, abbreviation string
+	var unique, required, editable, hasSubfields bool
+	var fieldCollection domain.FieldCollection
+	var collection domain.Collection
+	var idCollection, idField int64
+	var field domain.IField
+
+	var strSQL bytes.Buffer
+	strSQL.WriteString("SELECT ")
+	strSQL.WriteString("c.id, c.name, f.id, f.name, f.description, f.abbreviation, fc.isUnique, fc.required, fc.editable, count(s.id) as hasSubfields, fc.id ")
+	strSQL.WriteString("FROM fields f ")
+	strSQL.WriteString("INNER JOIN fields_collection fc ON f.id = fc.field_id ")
+	strSQL.WriteString("INNER JOIN collections c ON c.id = fc.collection_id ")
+	strSQL.WriteString("LEFT JOIN subfields s ON s.field_id = f.id ")
+	strSQL.WriteString("WHERE fc.id = ? ")
+	strSQL.WriteString("GROUP BY c.id, c.name, f.id, f.name, f.description, f.abbreviation, fc.isUnique, fc.required, fc.editable")
+
+	stmt, err := f.db.Source().Conn().Prepare(strSQL.String())
+	if err != nil {
+		log.Println("abix-admin / dao / FieldCollectionDao / FindById / Conn().Prepare: ", err)
+	}
+
+	row := stmt.QueryRow(id)
+	id = 0
+
+	row.Scan(&idCollection, &nameCollection, &idField, &nameField, &description, &abbreviation, &unique, &required, &editable, &hasSubfields, &id)
+
+	collection = *domain.NewCollection(nameCollection).WithId(idCollection)
+	field = domain.NewSingleField(nameField)
+	if hasSubfields {
+		field = domain.NewCompositeField(nameCollection, f.getSubfields(idField))
+	}
+
+	field.WithId(idField).WithAbbreviation(abbreviation).WithDescription(description)
+
+	fieldCollection.WithUnique(unique).WithEditable(editable).WithRequired(required).WithCollection(collection).WithField(field).WithId(id)
+
+	return fieldCollection
 }

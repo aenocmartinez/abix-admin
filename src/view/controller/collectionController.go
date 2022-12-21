@@ -179,3 +179,24 @@ func AllFieldsOfCollections(c *gin.Context) {
 	}
 	c.JSON(200, gin.H{"result": fields})
 }
+
+func ViewFieldCollection(c *gin.Context) {
+	var strId string = c.Param("id")
+	if len(strId) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "parámetro no válido"})
+		return
+	}
+
+	id, err := strconv.Atoi(strId)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "parámetro no válido"})
+		return
+	}
+	useCase := usecase.ViewFieldCollectionUseCase{}
+	field, err := useCase.Execute(int64(id))
+	if err != nil {
+		c.JSON(202, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{"result": field})
+}

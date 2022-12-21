@@ -79,7 +79,7 @@ func (c *Collection) Exists() bool {
 }
 
 func (c *Collection) AddField(field FieldCollection) error {
-	fieldCollection := c.repositoryFieldColecction.FindById(field.IdCollection(), field.IdField())
+	fieldCollection := c.repositoryFieldColecction.FindByIdCollectionAndIdField(field.IdCollection(), field.IdField())
 	if !fieldCollection.Exists() {
 		field.WithCollection(*c)
 		return c.repositoryFieldColecction.Add(field)
@@ -102,8 +102,12 @@ func (c *Collection) AllFields() []FieldCollection {
 	return c.fields
 }
 
-func FindFieldCollection(fieldCollection FieldCollection, repository FieldCollectionRepository) FieldCollection {
-	return repository.FindById(fieldCollection.IdCollection(), fieldCollection.IdField())
+func FindByIdCollectionAndIdField(fieldCollection FieldCollection, repository FieldCollectionRepository) FieldCollection {
+	return repository.FindByIdCollectionAndIdField(fieldCollection.IdCollection(), fieldCollection.IdField())
+}
+
+func FindByIdFieldCollection(id int64, repository FieldCollectionRepository) FieldCollection {
+	return repository.FindById(id)
 }
 
 func AllCollections(repository CollectionRepository) []Collection {

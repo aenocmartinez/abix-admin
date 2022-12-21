@@ -59,5 +59,13 @@ func main() {
 	r.PUT("/field", controller.UpdateField)
 	r.GET("/search-fields", controller.SearchFields)
 
+	// Sequences
+	r.GET("/sequences", controller.AllSequences)
+	r.POST("/sequence", controller.CreateSequence)
+	r.GET("/sequence/:id", controller.ViewSequence)
+	r.PUT("/sequence", controller.UpdateSequence)
+	r.DELETE("/sequence/:id", controller.DeleteSequence)
+	r.GET("/search-sequence/:name", controller.SearchSequences)
+
 	r.Run(":8082")
 }

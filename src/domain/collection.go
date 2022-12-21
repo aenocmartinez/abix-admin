@@ -1,17 +1,24 @@
 package domain
 
 type Collection struct {
-	id         int64
-	name       string
-	createdAt  string
-	updatedAt  string
-	repository CollectionRepository
+	id                        int64
+	name                      string
+	createdAt                 string
+	updatedAt                 string
+	fields                    []FieldCollection
+	repository                CollectionRepository
+	repositoryFieldColecction FieldCollectionRepository
 }
 
 func NewCollection(name string) *Collection {
 	return &Collection{
 		name: name,
 	}
+}
+
+func (c *Collection) WithRepositoryFieldCollection(repository FieldCollectionRepository) *Collection {
+	c.repositoryFieldColecction = repository
+	return c
 }
 
 func (c *Collection) WithName(name string) *Collection {
@@ -69,6 +76,34 @@ func (c *Collection) Update() error {
 
 func (c *Collection) Exists() bool {
 	return c.id > 0
+}
+
+func (c *Collection) AddField(field FieldCollection) error {
+	fieldCollection := c.repositoryFieldColecction.FindById(field.IdCollection(), field.IdField())
+	if !fieldCollection.Exists() {
+		field.WithCollection(*c)
+		return c.repositoryFieldColecction.Add(field)
+	}
+	fieldCollection.WithCollection(*c)
+	fieldCollection.WithEditable(field.Editable())
+	fieldCollection.WithUnique(field.Unique())
+	fieldCollection.WithRequired(field.Required())
+
+	return c.repositoryFieldColecction.Update(fieldCollection)
+}
+
+func (c *Collection) RemoveField(field FieldCollection) error {
+	field.WithCollection(*c)
+	return c.repositoryFieldColecction.Remove(field)
+}
+
+func (c *Collection) AllFields() []FieldCollection {
+	c.fields = c.repositoryFieldColecction.AllFields(c.id)
+	return c.fields
+}
+
+func FindFieldCollection(fieldCollection FieldCollection, repository FieldCollectionRepository) FieldCollection {
+	return repository.FindById(fieldCollection.IdCollection(), fieldCollection.IdField())
 }
 
 func AllCollections(repository CollectionRepository) []Collection {

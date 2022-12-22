@@ -7,4 +7,5 @@ type AddFieldToCollectionFormRequest struct {
 	Editable     bool  `json:"editable"`
 	Required     bool  `json:"required"`
 	IdSequence   int64 `json:"idSequence"`
+	IdList       int64 `json:"idList"`
 }

@@ -117,6 +117,7 @@ func AddFieldToCollection(c *gin.Context) {
 		Editable:     req.Editable,
 		Required:     req.Required,
 		Sequence:     req.IdSequence,
+		List:         req.IdList,
 	})
 
 	if err != nil {

@@ -89,6 +89,7 @@ func (c *Collection) AddField(field FieldCollection) error {
 	fieldCollection.WithUnique(field.Unique())
 	fieldCollection.WithRequired(field.Required())
 	fieldCollection.WithSequence(*field.Sequence())
+	fieldCollection.WithList(*field.List())
 
 	return c.repositoryFieldColecction.Update(fieldCollection)
 }

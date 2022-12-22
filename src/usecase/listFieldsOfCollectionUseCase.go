@@ -30,6 +30,9 @@ func (useCase *ListFieldsOfCollectionUseCase) Execute(idCollection int64) (field
 			Field:        fieldCollection.Field().Name(),
 			Collection:   fieldCollection.Collection().Name(),
 			Sequence:     fieldCollection.Sequence().Id(),
+			NameSequence: fieldCollection.Sequence().Name(),
+			List:         fieldCollection.List().Id(),
+			NameList:     fieldCollection.List().Name(),
 		})
 	}
 

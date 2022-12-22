@@ -21,7 +21,7 @@ func NewFieldCollectionDao() *FieldCollectionDao {
 
 func (f *FieldCollectionDao) Add(fc domain.FieldCollection) error {
 	var strSQL bytes.Buffer
-	strSQL.WriteString("INSERT INTO fields_collection(collection_id, field_id, isUnique, required, editable, sequence_id) VALUES (?, ?, ?, ?, ?, ?)")
+	strSQL.WriteString("INSERT INTO fields_collection(collection_id, field_id, isUnique, required, editable, sequence_id, list_id) VALUES (?, ?, ?, ?, ?, ?, ?)")
 	stmt, err := f.db.Source().Conn().Prepare(strSQL.String())
 	if err != nil {
 		log.Println("abix-admin / dao / FieldCollectionDao / Add / Conn().Prepare: ", err)
@@ -32,7 +32,12 @@ func (f *FieldCollectionDao) Add(fc domain.FieldCollection) error {
 		idSequence = sql.NullInt64{Int64: fc.Sequence().Id(), Valid: true}
 	}
 
-	_, err = stmt.Exec(fc.IdCollection(), fc.IdField(), fc.Unique(), fc.Required(), fc.Editable(), idSequence)
+	var idList sql.NullInt64
+	if fc.List().Exists() {
+		idList = sql.NullInt64{Int64: fc.List().Id(), Valid: true}
+	}
+
+	_, err = stmt.Exec(fc.IdCollection(), fc.IdField(), fc.Unique(), fc.Required(), fc.Editable(), idSequence, idList)
 	if err != nil {
 		log.Println("abix-admin / dao / FieldCollectionDao / Add / stmt.Exec: ", err)
 	}
@@ -64,7 +69,7 @@ func (f *FieldCollectionDao) AllFields(idCollection int64) (fields []domain.Fiel
 	strSQL.WriteString("SELECT ")
 	strSQL.WriteString("c.id, c.name, f.id, f.name, f.description, f.abbreviation, ")
 	strSQL.WriteString("fc.isUnique, fc.required, fc.editable, IF (count(s.field_id)>0, 1, 0) as hasSubfields, fc.id as idFieldCollection, ")
-	strSQL.WriteString("fc.sequence_id ")
+	strSQL.WriteString("fc.sequence_id, fc.list_id ")
 	strSQL.WriteString("FROM fields f ")
 	strSQL.WriteString("INNER JOIN fields_collection fc ON f.id = fc.field_id ")
 	strSQL.WriteString("INNER JOIN collections c ON c.id = fc.collection_id ")
@@ -91,8 +96,9 @@ func (f *FieldCollectionDao) AllFields(idCollection int64) (fields []domain.Fiel
 		var nameField, nameCollection, description, abbreviation string
 		var unique, required, editable, hasSubfields bool
 		var idSequence sql.NullInt64
+		var idList sql.NullInt64
 
-		rows.Scan(&idCollection, &nameCollection, &idField, &nameField, &description, &abbreviation, &unique, &required, &editable, &hasSubfields, &idFieldCollection, &idSequence)
+		rows.Scan(&idCollection, &nameCollection, &idField, &nameField, &description, &abbreviation, &unique, &required, &editable, &hasSubfields, &idFieldCollection, &idSequence, &idList)
 
 		var fieldCollection domain.FieldCollection = domain.FieldCollection{}
 
@@ -103,6 +109,12 @@ func (f *FieldCollectionDao) AllFields(idCollection int64) (fields []domain.Fiel
 			sequence := domain.Sequence{}
 			sequence.WithId(idSequence.Int64)
 			fieldCollection.WithSequence(sequence)
+		}
+
+		if idList.Valid {
+			list := domain.List{}
+			list.WithId(idList.Int64)
+			fieldCollection.WithList(list)
 		}
 
 		field = domain.NewSingleField(nameField)
@@ -129,7 +141,7 @@ func (f *FieldCollectionDao) FindByIdCollectionAndIdField(idCollection, idField 
 
 	var strSQL bytes.Buffer
 	strSQL.WriteString("SELECT ")
-	strSQL.WriteString("c.id, c.name, f.id, f.name, f.description, f.abbreviation, fc.isUnique, fc.required, fc.editable, count(s.id) as hasSubfields, fc.id, fc.sequence_id ")
+	strSQL.WriteString("c.id, c.name, f.id, f.name, f.description, f.abbreviation, fc.isUnique, fc.required, fc.editable, count(s.id) as hasSubfields, fc.id, fc.sequence_id, fc.list_id ")
 	strSQL.WriteString("FROM fields f ")
 	strSQL.WriteString("INNER JOIN fields_collection fc ON f.id = fc.field_id ")
 	strSQL.WriteString("INNER JOIN collections c ON c.id = fc.collection_id ")
@@ -148,10 +160,10 @@ func (f *FieldCollectionDao) FindByIdCollectionAndIdField(idCollection, idField 
 	idField = 0
 	var nameField, nameCollection, description, abbreviation string
 	var unique, required, editable, hasSubfields bool
-	var idSequence sql.NullInt64
+	var idSequence, idList sql.NullInt64
 	var id int64
 
-	row.Scan(&idCollection, &nameCollection, &idField, &nameField, &description, &abbreviation, &unique, &required, &editable, &hasSubfields, &id, &idSequence)
+	row.Scan(&idCollection, &nameCollection, &idField, &nameField, &description, &abbreviation, &unique, &required, &editable, &hasSubfields, &id, &idSequence, &idList)
 
 	collection = *domain.NewCollection(nameCollection).WithId(idCollection)
 	field = domain.NewSingleField(nameField)
@@ -168,12 +180,18 @@ func (f *FieldCollectionDao) FindByIdCollectionAndIdField(idCollection, idField 
 		fieldCollection.WithSequence(sequence)
 	}
 
+	if idList.Valid {
+		list := domain.List{}
+		list.WithId(idList.Int64)
+		fieldCollection.WithList(list)
+	}
+
 	return fieldCollection
 }
 
 func (f *FieldCollectionDao) Update(fc domain.FieldCollection) error {
 	var strSQL bytes.Buffer
-	strSQL.WriteString("UPDATE fields_collection SET isUnique=?, required=?, editable=?, sequence_id=?, updatedAt=NOW() WHERE collection_id = ? AND field_id = ?")
+	strSQL.WriteString("UPDATE fields_collection SET isUnique=?, required=?, editable=?, sequence_id=?, list_id=?, updatedAt=NOW() WHERE collection_id = ? AND field_id = ?")
 	stmt, err := f.db.Source().Conn().Prepare(strSQL.String())
 	if err != nil {
 		log.Println("abix-admin / dao / FieldCollectionDao / Update / Conn().Prepare: ", err)
@@ -184,7 +202,12 @@ func (f *FieldCollectionDao) Update(fc domain.FieldCollection) error {
 		idSequence = sql.NullInt64{Int64: fc.Sequence().Id(), Valid: true}
 	}
 
-	_, err = stmt.Exec(fc.Unique(), fc.Required(), fc.Editable(), idSequence, fc.IdCollection(), fc.IdField())
+	var idList sql.NullInt64
+	if fc.List().Exists() {
+		idList = sql.NullInt64{Int64: fc.List().Id(), Valid: true}
+	}
+
+	_, err = stmt.Exec(fc.Unique(), fc.Required(), fc.Editable(), idSequence, idList, fc.IdCollection(), fc.IdField())
 	if err != nil {
 		log.Println("abix-admin / dao / FieldCollectionDao / Update / stmt.Exec: ", err)
 	}
@@ -237,11 +260,11 @@ func (f *FieldCollectionDao) FindById(id int64) domain.FieldCollection {
 	var collection domain.Collection
 	var idCollection, idField int64
 	var field domain.IField
-	var idSequence sql.NullInt64
+	var idSequence, idList sql.NullInt64
 
 	var strSQL bytes.Buffer
 	strSQL.WriteString("SELECT ")
-	strSQL.WriteString("c.id, c.name, f.id, f.name, f.description, f.abbreviation, fc.isUnique, fc.required, fc.editable, count(s.id) as hasSubfields, fc.id, fc.sequence_id ")
+	strSQL.WriteString("c.id, c.name, f.id, f.name, f.description, f.abbreviation, fc.isUnique, fc.required, fc.editable, count(s.id) as hasSubfields, fc.id, fc.sequence_id, fc.list_id ")
 	strSQL.WriteString("FROM fields f ")
 	strSQL.WriteString("INNER JOIN fields_collection fc ON f.id = fc.field_id ")
 	strSQL.WriteString("INNER JOIN collections c ON c.id = fc.collection_id ")
@@ -257,7 +280,7 @@ func (f *FieldCollectionDao) FindById(id int64) domain.FieldCollection {
 	row := stmt.QueryRow(id)
 	id = 0
 
-	row.Scan(&idCollection, &nameCollection, &idField, &nameField, &description, &abbreviation, &unique, &required, &editable, &hasSubfields, &id, &idSequence)
+	row.Scan(&idCollection, &nameCollection, &idField, &nameField, &description, &abbreviation, &unique, &required, &editable, &hasSubfields, &id, &idSequence, &idList)
 
 	collection = *domain.NewCollection(nameCollection).WithId(idCollection)
 	field = domain.NewSingleField(nameField)
@@ -272,6 +295,12 @@ func (f *FieldCollectionDao) FindById(id int64) domain.FieldCollection {
 		sequence := domain.Sequence{}
 		sequence.WithId(idSequence.Int64)
 		fieldCollection.WithSequence(sequence)
+	}
+
+	if idList.Valid {
+		list := domain.List{}
+		list.WithId(idList.Int64)
+		fieldCollection.WithList(list)
 	}
 
 	return fieldCollection

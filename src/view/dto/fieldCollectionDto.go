@@ -10,4 +10,7 @@ type FieldCollectionDto struct {
 	Editable     bool   `json:"editable"`
 	Required     bool   `json:"required"`
 	Sequence     int64  `json:"sequene_id,omitempty"`
+	NameSequence string `json:"sequene_name,omitempty"`
+	List         int64  `json:"list_id,omitempty"`
+	NameList     string `json:"list_name,omitempty"`
 }

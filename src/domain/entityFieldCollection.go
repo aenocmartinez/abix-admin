@@ -8,6 +8,7 @@ type FieldCollection struct {
 	editable   bool
 	required   bool
 	sequence   Sequence
+	list       List
 }
 
 func NewFieldCollection(collection Collection, field IField) *FieldCollection {
@@ -19,6 +20,11 @@ func NewFieldCollection(collection Collection, field IField) *FieldCollection {
 
 func (f *FieldCollection) WithSequence(sequence Sequence) *FieldCollection {
 	f.sequence = sequence
+	return f
+}
+
+func (f *FieldCollection) WithList(list List) *FieldCollection {
+	f.list = list
 	return f
 }
 
@@ -74,6 +80,10 @@ func (f *FieldCollection) Collection() *Collection {
 
 func (f *FieldCollection) Field() IField {
 	return f.field
+}
+
+func (f *FieldCollection) List() *List {
+	return &f.list
 }
 
 func (f *FieldCollection) IdCollection() int64 {

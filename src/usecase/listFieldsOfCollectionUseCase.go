@@ -28,7 +28,8 @@ func (useCase *ListFieldsOfCollectionUseCase) Execute(idCollection int64) (field
 			Editable:     fieldCollection.Editable(),
 			Required:     fieldCollection.Required(),
 			Field:        fieldCollection.Field().Name(),
-			// Collection:   fieldCollection.Collection().Name(),
+			Collection:   fieldCollection.Collection().Name(),
+			Sequence:     fieldCollection.Sequence().Id(),
 		})
 	}
 

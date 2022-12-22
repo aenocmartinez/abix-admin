@@ -88,6 +88,7 @@ func (c *Collection) AddField(field FieldCollection) error {
 	fieldCollection.WithEditable(field.Editable())
 	fieldCollection.WithUnique(field.Unique())
 	fieldCollection.WithRequired(field.Required())
+	fieldCollection.WithSequence(*field.Sequence())
 
 	return c.repositoryFieldColecction.Update(fieldCollection)
 }

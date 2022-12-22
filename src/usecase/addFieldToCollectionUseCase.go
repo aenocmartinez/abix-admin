@@ -15,6 +15,7 @@ func (useCase *AddFieldToCollectionUseCase) Execute(dtoFieldCollection dto.Field
 	var repositoryFieldCollection domain.FieldCollectionRepository = mysql.NewFieldCollectionDao()
 	var repositoryCollection domain.CollectionRepository = mysql.NewCollectionDao()
 	var repositoryField domain.FieldRepository = mysql.NewFieldDao()
+	var repositorySequence domain.RepositorySequence = mysql.NewSequenceDao()
 
 	collection := domain.FindCollectionById(dtoFieldCollection.IdCollection, repositoryCollection)
 	if !collection.Exists() {
@@ -31,6 +32,11 @@ func (useCase *AddFieldToCollectionUseCase) Execute(dtoFieldCollection dto.Field
 	fieldCollection.WithRequired(dtoFieldCollection.Required)
 	fieldCollection.WithUnique(dtoFieldCollection.Unique)
 
+	sequence := domain.FindSequenceById(dtoFieldCollection.Sequence, repositorySequence)
+	if sequence.Exists() {
+		fieldCollection.WithSequence(sequence)
+	}
+
 	collection.WithRepositoryFieldCollection(repositoryFieldCollection)
 	err = collection.AddField(*fieldCollection)
 	if err != nil {
@@ -38,4 +44,5 @@ func (useCase *AddFieldToCollectionUseCase) Execute(dtoFieldCollection dto.Field
 	}
 
 	return 200, nil
+
 }

@@ -25,6 +25,7 @@ func (useCase *ViewFieldCollectionUseCase) Execute(idFieldCollection int64) (dto
 	dtoField.Unique = fieldCollection.Unique()
 	dtoField.Editable = fieldCollection.Editable()
 	dtoField.Required = fieldCollection.Required()
+	dtoField.Sequence = fieldCollection.Sequence().Id()
 
 	return dtoField, nil
 }

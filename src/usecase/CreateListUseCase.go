@@ -23,6 +23,7 @@ func (useCase *CreateListUseCase) Execute(dtoList dto.ListDto) (code int, err er
 	}
 
 	list = *domain.NewList(dtoList.Name).WithValues(dtoList.Values)
+	list.WithRepository(repository)
 
 	if err = list.Create(); err != nil {
 		return 500, err

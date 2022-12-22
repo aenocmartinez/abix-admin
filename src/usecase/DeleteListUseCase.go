@@ -19,6 +19,8 @@ func (useCase *DeleteListUseCase) Execute(id int64) (code int, err error) {
 		return 202, errors.New("la lista no existe")
 	}
 
+	list.WithRepository(repository)
+
 	if err = list.Delete(); err != nil {
 		return 500, err
 	}

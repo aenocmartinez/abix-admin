@@ -67,5 +67,13 @@ func main() {
 	r.DELETE("/sequence/:id", controller.DeleteSequence)
 	r.GET("/search-sequence/:name", controller.SearchSequences)
 
+	// List
+	r.GET("/lists", controller.AllList)
+	r.POST("/list", controller.CreateList)
+	r.GET("/list/:id", controller.ViewList)
+	r.PUT("/list", controller.UpdateList)
+	r.DELETE("/list/:id", controller.DeleteList)
+	r.GET("/search-list/:name", controller.SearchList)
+
 	r.Run(":8082")
 }

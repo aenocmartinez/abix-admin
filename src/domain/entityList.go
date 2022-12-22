@@ -1,11 +1,11 @@
 package domain
 
-import "log"
-
 type List struct {
 	id         int64
 	name       string
 	values     []string
+	createAt   string
+	updatedAt  string
 	repository RepositoryList
 }
 
@@ -18,6 +18,16 @@ func NewList(name string) *List {
 
 func (l *List) WithId(id int64) *List {
 	l.id = id
+	return l
+}
+
+func (l *List) WithCreatedAt(createdAt string) *List {
+	l.createAt = createdAt
+	return l
+}
+
+func (l *List) WithUpdatedAt(updatedAt string) *List {
+	l.updatedAt = updatedAt
 	return l
 }
 
@@ -44,6 +54,14 @@ func (l *List) Name() string {
 	return l.name
 }
 
+func (l *List) CreatedAt() string {
+	return l.createAt
+}
+
+func (l *List) UpdatedAt() string {
+	return l.updatedAt
+}
+
 func (l *List) Create() error {
 	return l.repository.Create(*l)
 }
@@ -60,24 +78,7 @@ func (l *List) Exists() bool {
 	return l.id > 0
 }
 
-func (l *List) AddValue(value string) error {
-	return l.repository.AddValue(l.id, value)
-}
-
-func (l *List) RemoveValue(value string) error {
-	return l.repository.RemoveValue(l.id, value)
-}
-
 func (l *List) Values() []string {
-	var err error
-	if len(l.values) > 0 {
-		return l.values
-	}
-
-	l.values, err = l.repository.Values(l.id)
-	if err != nil {
-		log.Println("abix-admin / domain / List / values(): ", err)
-	}
 	return l.values
 }
 

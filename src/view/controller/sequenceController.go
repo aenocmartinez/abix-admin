@@ -79,7 +79,8 @@ func DeleteSequence(c *gin.Context) {
 }
 
 func ViewSequence(c *gin.Context) {
-	var strId string = c.Param("id")
+	// var strId string = c.Param("id")
+	var strId string = c.Query("id")
 	if len(strId) == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "parámetro no válido"})
 		return
@@ -113,7 +114,8 @@ func AllSequences(c *gin.Context) {
 }
 
 func SearchSequences(c *gin.Context) {
-	var name string = c.Param("name")
+	// var name string = c.Param("name")
+	var name string = c.Query("name")
 	useCase := usecase.SearchSequenceUseCase{}
 	sequences, err := useCase.Execute(name)
 

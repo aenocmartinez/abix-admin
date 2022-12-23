@@ -50,7 +50,8 @@ func UpdateCollection(c *gin.Context) {
 }
 
 func ViewCollection(c *gin.Context) {
-	var strId string = c.Param("id")
+	// var strId string = c.Param("id")
+	var strId string = c.Query("id")
 	if len(strId) == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "parámetro no válido"})
 		return
@@ -128,32 +129,39 @@ func AddFieldToCollection(c *gin.Context) {
 }
 
 func RemoveFieldToCollection(c *gin.Context) {
-	var strIdCollection string = c.Param("idCollection")
-	var strIdField string = c.Param("idField")
-	if len(strIdCollection) == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "parámetro idCollection no válido"})
-		return
-	}
-
-	idCollection, err := strconv.Atoi(strIdCollection)
+	var req formrequest.RemoveFieldToCollectionFormRequest
+	err := c.ShouldBindJSON(&req)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "parámetro idCollection no válido"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "parámetros body no válidos"})
 		return
 	}
 
-	if len(strIdField) == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "parámetro iddField no válido"})
-		return
-	}
+	// var strIdCollection string = c.Param("idCollection")
+	// var strIdField string = c.Param("idField")
+	// if len(strIdCollection) == 0 {
+	// 	c.JSON(http.StatusBadRequest, gin.H{"error": "parámetro idCollection no válido"})
+	// 	return
+	// }
 
-	iddField, err := strconv.Atoi(strIdField)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "parámetro iddField no válido"})
-		return
-	}
+	// idCollection, err := strconv.Atoi(strIdCollection)
+	// if err != nil {
+	// 	c.JSON(http.StatusBadRequest, gin.H{"error": "parámetro idCollection no válido"})
+	// 	return
+	// }
+
+	// if len(strIdField) == 0 {
+	// 	c.JSON(http.StatusBadRequest, gin.H{"error": "parámetro iddField no válido"})
+	// 	return
+	// }
+
+	// iddField, err := strconv.Atoi(strIdField)
+	// if err != nil {
+	// 	c.JSON(http.StatusBadRequest, gin.H{"error": "parámetro iddField no válido"})
+	// 	return
+	// }
 
 	useCase := usecase.RemoveFieldToCollectionUseCase{}
-	code, err := useCase.Execute(int64(idCollection), int64(iddField))
+	code, err := useCase.Execute(req.IdCollection, req.IdField)
 	if err != nil {
 		c.JSON(code, gin.H{"error": err.Error()})
 		return
@@ -162,7 +170,8 @@ func RemoveFieldToCollection(c *gin.Context) {
 }
 
 func AllFieldsOfCollections(c *gin.Context) {
-	var strIdCollection string = c.Param("idCollection")
+	// var strIdCollection string = c.Param("idCollection")
+	var strIdCollection string = c.Query("idCollection")
 	if len(strIdCollection) == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "parámetro no válido"})
 		return
@@ -183,7 +192,8 @@ func AllFieldsOfCollections(c *gin.Context) {
 }
 
 func ViewFieldCollection(c *gin.Context) {
-	var strId string = c.Param("id")
+	// var strId string = c.Param("id")
+	var strId string = c.Query("id")
 	if len(strId) == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "parámetro no válido"})
 		return

@@ -48,9 +48,7 @@ func (s *Sequence) WithPrefix(prefix string) *Sequence {
 }
 
 func (s *Sequence) WithValue(value int64) *Sequence {
-	if value > 1 {
-		s.value = value
-	}
+	s.value = value
 	return s
 }
 

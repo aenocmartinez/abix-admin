@@ -5,6 +5,7 @@ import (
 	"abix360/src/domain"
 	"abix360/src/view/dto"
 	"errors"
+	"log"
 )
 
 type UpdateSequenceUseCase struct{}
@@ -18,9 +19,9 @@ func (useCase *UpdateSequenceUseCase) Execute(dtoSequence dto.SequenceDto) (code
 	}
 
 	sequence.WithName(dtoSequence.Name).WithPrefix(dtoSequence.Prefix).WithValue(dtoSequence.Value).WithRepository(repository)
-
 	err = sequence.Update()
 	if err != nil {
+		log.Println("sequence: ", err.Error())
 		return 500, err
 	}
 	return 200, nil

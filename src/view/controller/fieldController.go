@@ -80,7 +80,8 @@ func UpdateField(c *gin.Context) {
 }
 
 func ViewField(c *gin.Context) {
-	var strId string = c.Param("id")
+	var strId string = c.Query("id")
+	// var strId string = c.Param("id")
 	if len(strId) == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "parámetro no válido"})
 		return

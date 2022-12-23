@@ -80,7 +80,8 @@ func DeleteList(c *gin.Context) {
 }
 
 func ViewList(c *gin.Context) {
-	var strId string = c.Param("id")
+	// var strId string = c.Param("id")
+	var strId string = c.Query("id")
 	if len(strId) == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "parámetro no válido"})
 		return
@@ -104,7 +105,8 @@ func ViewList(c *gin.Context) {
 }
 
 func SearchList(c *gin.Context) {
-	var name string = c.Param("name")
+	// var name string = c.Param("name")
+	var name string = c.Query("name")
 	if len(name) == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "parámetro no válido"})
 		return
